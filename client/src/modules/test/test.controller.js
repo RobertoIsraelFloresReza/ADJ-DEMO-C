@@ -5,15 +5,31 @@ const ENV = import.meta.env;
 const API_URL = `http://${ENV.VITE_API_HOST}:${ENV.VITE_API_PORT}${ENV.VITE_API_BASE_URL}`;
 
 TestController.callToApi = async () => {
-    await fetch(`${API_URL}adj-demo/tes t`), {
-        method: 'GET',
-        headers: { 'Accept': 'application/json' }
+    const url = `${API_URL}/test`;  // ← Agregar la barra y quitar espacio
+    
+    try {
+        // Opción 1: Usando async/await (recomendado)
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: { 
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
 
-    }.then(res => res.json()).then(res => {
-        console.log('Response from API:', res);
-    }).catch(err => {
-        console.error('Error calling API:', err);
-    });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('✅ Response from API:', data);
+        return data;
+
+    } catch (error) {
+        console.error('❌ Error calling API:', error);
+        console.error('Error details:', error.message);
+        throw error; // Opcional: re-lanzar el error
+    }
 };
 
 export default TestController;
