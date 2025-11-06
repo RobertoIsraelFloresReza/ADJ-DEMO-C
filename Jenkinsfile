@@ -1,64 +1,58 @@
 pipeline {
     agent any
-
     environment {
-            PATH = '/usr/local/bin:¢{PATH:env}'
+        // Definir variables de entorno si es necesario
+        PATH = "/usr/local/bin:${env.PATH}"
     }
 
     stages {
-        // parar todos los servicios 
-        stage('Parando Servicios') {
+        // etapa para parar los servicios
+        stage('Parando los servicios') {
             steps {
-                sh '''
-                    docker-compose -p adj-demo down || true
-                   '''
+               sh  '''
+                docker-compose -p demo down || true
+               '''
             }
-    
+        }
+        // etapa para eliminar imagenes antiguas
+        stage('Eliminando imagenes antiguas') {
+            steps {
+               sh  '''
+                IMAGES=$(docker images --filter "label=com.docker.compose.project=adj-demo" -q)
+                if [ -n "$IMAGES" ]; then
+                    docker rmi -f $IMAGES || true
+                else 
+                    echo "No hay imagenes para eliminar"
+                fi
+               '''
+            }
         }
 
-        // pera eliminar las imagenes anteriores 
-        stage('Eliminando Imagenes Anteriores') {
+        // etapa para descargar actualizaciones del repositorio
+        stage('Descargando actualizaciones del repositorio') {
             steps {
-                sh '''
-                    IMAGES=$(docker images --filter "label=com.docker.compose.project=adj-demo" -q)
-                    if [ -n "$IMAGES" ]; then
-                        docker images rmi $IMAGES
-                    else 
-                        echo "No hay imagenes para eliminar"
-                    fi
-                   '''
+               checkout scm // que es scm? --> Source Code Management
             }
-    
         }
-
-        // bajar la actualizacion 
-        stage('Bajando Actualizacion') {
+        // etapa para construir y desplegar
+        stage('Construyendo y desplegando') {
             steps {
-                checkout scm
+               sh  '''
+                docker-compose up --build -d
+               '''
             }
-    
-        }
-
-        // levantar y desplegar proyecto 
-        stage('Desplegando Proyecto') {
-            steps {
-                sh '''
-                    docker-compose up --build -d
-                   '''
-            }
-    
         }
     }
 
     post {
-        always {
-            echo 'Pipeline finalizado.'
-        }
         success {
-            echo 'Pipeline ejecutado exitósamente.'
+            echo 'Pipeline ejecutada con exito'
         }
         failure {
-            echo 'Error en la ejecución del pipeline.'
+            echo 'Pipeline fallida'
+        }
+        always {
+            echo 'Pipeline finalizada'
         }
     }
 }
