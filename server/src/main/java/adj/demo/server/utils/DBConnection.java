@@ -18,7 +18,7 @@ public class DBConnection {
     @Value("${db.user}")
     private String user;
 
-    @Value("${db.password}")
+    @Value("${db.pass}")
     private String password;
 
     @Bean
