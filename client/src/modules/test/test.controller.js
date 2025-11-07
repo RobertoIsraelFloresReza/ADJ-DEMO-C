@@ -2,7 +2,7 @@ const TestController = {};
 
 const ENV = import.meta.env;
 
-const API_URL = `http://${ENV.VITE_API_HOST}:${ENV.VITE_API_PORT}${ENV.VITE_API_BASE_URL}`;
+const API_URL = `http://${ENV.VITE_API_HOST}:${ENV.VITE_API_PORT}${ENV.VITE_API_BASE}`;
 
 TestController.callToApi = async () => {
     const url = `${API_URL}/test`;  // ← Agregar la barra y quitar espacio
