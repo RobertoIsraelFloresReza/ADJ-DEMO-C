@@ -15,6 +15,9 @@ public class DBConnection {
     @Value("${db.port}")
     private String port;
 
+    @Value("${db.name}")
+    private String name;
+
     @Value("${db.user}")
     private String user;
 
@@ -25,7 +28,7 @@ public class DBConnection {
     public DataSource getDBConnection() {
         DriverManagerDataSource source = new DriverManagerDataSource();
         source.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        source.setUrl("jdbc:mysql://" + host + ":" + port + "/adj_demo");
+        source.setUrl("jdbc:mysql://" + host + ":" + port + "/" +name);
         source.setUsername(user);
         source.setPassword(password);
         return source;
